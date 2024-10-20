@@ -1,0 +1,4 @@
+{
+  "npm.enableRunFromFolder": true,
+  "typescript.tsdk": "node_modules/typescript/lib"
+}
