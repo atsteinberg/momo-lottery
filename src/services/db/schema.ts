@@ -1,12 +1,13 @@
-import { relations } from "drizzle-orm";
-import { pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
+import { relations } from 'drizzle-orm';
+import { boolean, pgTable, text, uuid, varchar } from 'drizzle-orm/pg-core';
 
-export const users = pgTable("users", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name"),
-  email: varchar("email", { length: 255 }).notNull().unique(),
-  clerkId: text("clerk_id").notNull().unique(),
-  childId: uuid("child_id").references(() => children.id),
+export const users = pgTable('users', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name'),
+  email: varchar('email', { length: 255 }).notNull().unique(),
+  clerkId: text('clerk_id').notNull().unique(),
+  childId: uuid('child_id').references(() => children.id),
+  isVerified: boolean('is_verified').default(false),
 });
 
 export const usersRelations = relations(users, ({ one }) => ({
@@ -16,9 +17,9 @@ export const usersRelations = relations(users, ({ one }) => ({
   }),
 }));
 
-export const children = pgTable("children", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name").notNull(),
+export const children = pgTable('children', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
 });
 
 export const childrenRelations = relations(children, ({ many }) => ({

@@ -1,11 +1,11 @@
-import { SignedIn, SignOutButton } from "@clerk/nextjs";
-import { currentUser } from "@clerk/nextjs/server";
-import { LogOut } from "lucide-react";
+import { SignedIn, SignOutButton } from '@clerk/nextjs';
+import { currentUser } from '@clerk/nextjs/server';
+import { LogOut } from 'lucide-react';
 
 const Header = async () => {
   const user = await currentUser();
   return (
-    <header className="py-4 bg-gray-100 flex justify-between items-center md:px-10 px-4">
+    <header className="py-4 bg-slate-100 flex justify-between items-center md:px-10 px-4">
       <div>
         <h3>Hi, {user?.firstName}!</h3>
       </div>

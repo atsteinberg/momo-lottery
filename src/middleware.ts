@@ -1,9 +1,31 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
+import { clerkMiddleware } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
 
-
-export default clerkMiddleware((auth) => {
-  auth().protect()
-})
+export default clerkMiddleware(async (auth, req) => {
+  // Skip onboarding check for API routes and the registration page
+  if (
+    req.nextUrl.pathname.startsWith('/api/users') ||
+    req.nextUrl.pathname === '/register'
+  ) {
+    console.log('skipping onboarding check');
+    return NextResponse.next();
+  }
+  const { userId } = auth();
+  if (userId) {
+    const response = await fetch(`http://localhost:3000/api/users/${userId}`);
+    if (response.ok) {
+      const user = await response.json();
+      console.log({ user });
+      if (!user) {
+        return NextResponse.redirect(new URL('/register', req.url));
+      }
+      if (!user.isVerified) {
+        return NextResponse.redirect(new URL('/unverified', req.url));
+      }
+    }
+  }
+  auth().protect();
+});
 
 export const config = {
   matcher: [

@@ -15,6 +15,13 @@
       "when": 1729434167744,
       "tag": "0001_ambitious_raider",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1729454130565,
+      "tag": "0002_blue_vance_astro",
+      "breakpoints": true
     }
   ]
 }
