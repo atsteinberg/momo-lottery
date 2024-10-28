@@ -3,7 +3,8 @@ import { boolean, pgTable, text, uuid, varchar } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
-  name: text('name'),
+  firstName: text('first_name'),
+  lastName: text('last_name'),
   email: varchar('email', { length: 255 }).notNull().unique(),
   clerkId: text('clerk_id').notNull().unique(),
   childId: uuid('child_id').references(() => children.id),

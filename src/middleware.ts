@@ -5,7 +5,8 @@ export default clerkMiddleware(async (auth, req) => {
   // Skip onboarding check for API routes and the registration page
   if (
     req.nextUrl.pathname.startsWith('/api/users') ||
-    req.nextUrl.pathname === '/register'
+    req.nextUrl.pathname === '/register' ||
+    req.nextUrl.pathname === '/unverified'
   ) {
     console.log('skipping onboarding check');
     return NextResponse.next();

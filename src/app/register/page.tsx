@@ -1,6 +1,6 @@
+import { SelectChild } from '@/components/composites/select-child';
 import Typography from '@/components/ui/typography';
 import db from '@/services/db';
-import SelectChild from './select-child';
 
 const RegisterPage = async () => {
   const kids = await db.query.children.findMany();

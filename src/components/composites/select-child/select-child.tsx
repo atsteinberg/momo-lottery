@@ -12,30 +12,29 @@ import {
 } from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
 import { FC } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { registerUser } from './select-child.actions';
+import { FormSchema, SelectChildFormValues } from './select-child.schema';
 
 type SelectChildProps = {
   kids: { id: string; name: string }[];
 };
 
-const FormSchema = z.object({
-  kid: z.string({ required_error: 'Bitte wähle den Namen Deines Kindes' }),
-  newKid: z.string().optional(),
-});
-
 const SelectChild: FC<SelectChildProps> = ({ kids }) => {
-  const form = useForm<z.infer<typeof FormSchema>>({
+  const router = useRouter();
+  const form = useForm<SelectChildFormValues>({
     resolver: zodResolver(FormSchema),
   });
-  const onSubmit = (data: z.infer<typeof FormSchema>) => {
+  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+    const kid = await registerUser(data);
     toast({
       title: 'Kind ausgewählt',
-      description: `Du hast folgendes Kind ausgewählt: ${data.kid} ${
-        data.kid === 'new' ? `(${data.newKid})` : data.kid
-      }`,
+      description: `Du hast folgendes Kind ausgewählt: ${kid.childName}`,
     });
+    router.push('/unverified');
   };
   return (
     <Form {...form}>
