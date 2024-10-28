@@ -55,7 +55,7 @@ const Typography: FC<TypographyProps> = ({
       ...variantProps,
       markdown,
     }),
-    className
+    className,
   );
   const Component = as;
   if (markdown && typeof children === 'string') {

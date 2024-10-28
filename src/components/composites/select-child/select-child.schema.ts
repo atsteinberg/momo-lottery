@@ -15,7 +15,7 @@ export const FormSchema = z
     {
       message: 'Bitte gib den Namen des neuen Kindes ein',
       path: ['newKid'],
-    }
+    },
   );
 
 export type SelectChildFormValues = z.infer<typeof FormSchema>;

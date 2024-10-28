@@ -57,12 +57,8 @@
           "name": "user_children_user_id_users_id_fk",
           "tableFrom": "user_children",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -70,12 +66,8 @@
           "name": "user_children_child_id_children_id_fk",
           "tableFrom": "user_children",
           "tableTo": "children",
-          "columnsFrom": [
-            "child_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["child_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -83,10 +75,7 @@
       "compositePrimaryKeys": {
         "user_children_user_id_child_id_pk": {
           "name": "user_children_user_id_child_id_pk",
-          "columns": [
-            "user_id",
-            "child_id"
-          ]
+          "columns": ["user_id", "child_id"]
         }
       },
       "uniqueConstraints": {},
@@ -129,16 +118,12 @@
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         },
         "users_clerk_id_unique": {
           "name": "users_clerk_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "clerk_id"
-          ]
+          "columns": ["clerk_id"]
         }
       },
       "checkConstraints": {}

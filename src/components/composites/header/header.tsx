@@ -11,7 +11,7 @@ const Header: FC<PropsWithClassName> = async ({ className }) => {
     <header
       className={cn(
         'py-4 bg-slate-100 flex justify-between items-center md:px-10 px-4',
-        className
+        className,
       )}
     >
       <div>
