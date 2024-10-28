@@ -30,9 +30,9 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" className="h-full flex-1">
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased flex bg-slate-50 flex-1 flex-col max-h-screen overflow-hidden min-h-screen`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased flex bg-secondary flex-1 flex-col max-h-screen overflow-hidden min-h-screen`}
         >
-          <Header className="bg-slate-800 text-white" />
+          <Header />
           <main className="flex-1 flex overflow-auto p-2 sm:p-8 max-w-7xl w-full  mx-auto">
             {children}
           </main>
