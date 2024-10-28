@@ -1,5 +1,6 @@
 import Header from '@/components/composites/header';
 import { Toaster } from '@/components/ui/toaster';
+import { deDE } from '@clerk/localizations';
 import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
@@ -27,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider localization={deDE}>
       <html lang="en" className="h-full flex-1">
         <head>
           <link

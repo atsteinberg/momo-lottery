@@ -1,5 +1,12 @@
 import { relations } from 'drizzle-orm';
-import { boolean, pgTable, text, uuid, varchar } from 'drizzle-orm/pg-core';
+import {
+  boolean,
+  date,
+  pgTable,
+  text,
+  uuid,
+  varchar,
+} from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -25,4 +32,38 @@ export const children = pgTable('children', {
 
 export const childrenRelations = relations(children, ({ many }) => ({
   users: many(users),
+}));
+
+export const appSettings = pgTable('app_settings', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  targetMonth: date('target_month').notNull(),
+});
+
+export const lunchRequests = pgTable('lunch_requests', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  date: date('date').notNull(),
+  targetMonth: date('target_month'),
+  userId: uuid('user_id').references(() => users.id),
+  snackRequestId: uuid('snack_request_id').references(() => snackRequests.id),
+});
+
+export const snackRequests = pgTable('snack_requests', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  date: date('date').notNull(),
+  targetMonth: date('target_month'),
+  userId: uuid('user_id').references(() => users.id),
+});
+
+export const lunchRequestsRelations = relations(lunchRequests, ({ one }) => ({
+  snack: one(snackRequests, {
+    fields: [lunchRequests.snackRequestId],
+    references: [snackRequests.id],
+  }),
+}));
+
+export const snackRequestsRelations = relations(snackRequests, ({ one }) => ({
+  lunch: one(lunchRequests, {
+    fields: [snackRequests.id],
+    references: [lunchRequests.snackRequestId],
+  }),
 }));
