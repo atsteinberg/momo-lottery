@@ -31,7 +31,7 @@ const MobileTooltip: FC<MobileTooltipProps> = ({ trigger, children }) => {
           {trigger}
         </button>
       </TooltipTrigger>
-      <TooltipContent className="flex flex-col gap-2 max-w-xl p-4">
+      <TooltipContent className="flex flex-col gap-2 max-w-full sm:max-w-xl p-4">
         {children}
       </TooltipContent>
     </Tooltip>
