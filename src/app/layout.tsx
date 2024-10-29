@@ -1,7 +1,6 @@
+import GlobalContextProvider from '@/components/composites/global-context-provider';
 import Header from '@/components/composites/header';
-import { Toaster } from '@/components/ui/toaster';
-import { deDE } from '@clerk/localizations';
-import { ClerkProvider } from '@clerk/nextjs';
+import { Toaster } from '@/components/ui/sonner';
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
@@ -28,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider localization={deDE}>
+    <GlobalContextProvider>
       <html lang="en" className="h-full flex-1">
         <head>
           <link
@@ -60,6 +59,6 @@ export default function RootLayout({
           <Toaster />
         </body>
       </html>
-    </ClerkProvider>
+    </GlobalContextProvider>
   );
 }

@@ -10,11 +10,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { toast } from '@/hooks/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { FC } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
 import { registerUser } from './select-child.actions';
 import { FormSchema, SelectChildFormValues } from './select-child.schema';
@@ -30,8 +30,7 @@ const SelectChild: FC<SelectChildProps> = ({ kids }) => {
   });
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     const kid = await registerUser(data);
-    toast({
-      title: 'Kind ausgewählt',
+    toast('Kind ausgewählt', {
       description: `Du hast folgendes Kind ausgewählt: ${kid.childName}`,
     });
     router.push('/unverified');
