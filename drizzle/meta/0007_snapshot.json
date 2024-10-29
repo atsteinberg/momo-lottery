@@ -1,5 +1,5 @@
 {
-  "id": "2022fec9-e4c5-4c0f-9b82-ee361d478f74",
+  "id": "635265a3-81bb-4e35-b674-79c3e7c5ce1a",
   "prevId": "08592f95-3155-447b-9d95-a070dd34e957",
   "version": "7",
   "dialect": "postgresql",
@@ -81,9 +81,9 @@
           "primaryKey": false,
           "notNull": false
         },
-        "snack_request_id": {
-          "name": "snack_request_id",
-          "type": "uuid",
+        "meal_type": {
+          "name": "meal_type",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         }
@@ -93,69 +93,6 @@
         "lunch_requests_user_id_users_id_fk": {
           "name": "lunch_requests_user_id_users_id_fk",
           "tableFrom": "lunch_requests",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "lunch_requests_snack_request_id_snack_requests_id_fk": {
-          "name": "lunch_requests_snack_request_id_snack_requests_id_fk",
-          "tableFrom": "lunch_requests",
-          "tableTo": "snack_requests",
-          "columnsFrom": [
-            "snack_request_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "public.snack_requests": {
-      "name": "snack_requests",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "date": {
-          "name": "date",
-          "type": "date",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "target_month": {
-          "name": "target_month",
-          "type": "date",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "snack_requests_user_id_users_id_fk": {
-          "name": "snack_requests_user_id_users_id_fk",
-          "tableFrom": "snack_requests",
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
@@ -214,6 +151,13 @@
         },
         "is_verified": {
           "name": "is_verified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "is_admin": {
+          "name": "is_admin",
           "type": "boolean",
           "primaryKey": false,
           "notNull": false,

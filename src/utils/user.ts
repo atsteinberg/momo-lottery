@@ -12,9 +12,19 @@ export const getUser = async (clerkUserId?: string | null) => {
   }
   const dbUser = await db.query.users.findFirst({
     where: eq(users.clerkId, id),
+    with: {
+      child: true,
+    },
   });
-  console.log('dbUser', dbUser);
   return dbUser ?? null;
+};
+
+export const getExistingUser = async (clerkUserId?: string | null) => {
+  const user = await getUser(clerkUserId);
+  if (!user) {
+    throw new Error('Cannot retrieve user');
+  }
+  return user;
 };
 
 export default getUser;

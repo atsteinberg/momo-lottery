@@ -8,6 +8,8 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 
+export type MealRequestType = 'lunch' | 'snacks';
+
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
   firstName: text('first_name'),
@@ -16,6 +18,7 @@ export const users = pgTable('users', {
   clerkId: text('clerk_id').notNull().unique(),
   childId: uuid('child_id').references(() => children.id),
   isVerified: boolean('is_verified').default(false),
+  isAdmin: boolean('is_admin').default(false),
 });
 
 export const usersRelations = relations(users, ({ one }) => ({
@@ -39,31 +42,12 @@ export const appSettings = pgTable('app_settings', {
   targetMonth: date('target_month').notNull(),
 });
 
-export const lunchRequests = pgTable('lunch_requests', {
+export const mealRequests = pgTable('meal_requests', {
   id: uuid('id').primaryKey().defaultRandom(),
   date: date('date').notNull(),
   targetMonth: date('target_month'),
   userId: uuid('user_id').references(() => users.id),
-  snackRequestId: uuid('snack_request_id').references(() => snackRequests.id),
+  type: text('meal_type', {
+    enum: ['lunch', 'snacks'],
+  }).$type<MealRequestType>(),
 });
-
-export const snackRequests = pgTable('snack_requests', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  date: date('date').notNull(),
-  targetMonth: date('target_month'),
-  userId: uuid('user_id').references(() => users.id),
-});
-
-export const lunchRequestsRelations = relations(lunchRequests, ({ one }) => ({
-  snack: one(snackRequests, {
-    fields: [lunchRequests.snackRequestId],
-    references: [snackRequests.id],
-  }),
-}));
-
-export const snackRequestsRelations = relations(snackRequests, ({ one }) => ({
-  lunch: one(lunchRequests, {
-    fields: [snackRequests.id],
-    references: [lunchRequests.snackRequestId],
-  }),
-}));
