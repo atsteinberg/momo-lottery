@@ -28,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <GlobalContextProvider>
-      <html lang="en" className="h-full flex-1">
+      <html lang="en" className="h-dvh flex-1">
         <head>
           <link
             rel="icon"
