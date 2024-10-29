@@ -23,10 +23,11 @@ const RulesInfo: FC<PropsWithClassName> = ({ className }) => {
         </Typography>
         <Typography>Hier kann man im voraus Termine reservieren.</Typography>
         <Typography>
-          Wähle einfach maximal 5 Termine für Jause und maximal 5 Termine fürs
-          Mittagessen. Diese werden vergeben, bevor die Essensliste live geht.
-          Bei Konflikten entscheidet das Los. Sollte keiner der gewünschten
-          Termine für Dich frei sein, wirst Du rechtzeitig per Email informiert.
+          Wähle einfach maximal 5 mögliche Termine für Jause und maximal 5
+          mögliche Termine fürs Mittagessen. Jeweils ein Termin pro Kind wird
+          vergeben, bevor die Essensliste live geht. Bei Konflikten entscheidet
+          das Los. Sollte keiner der gewünschten Termine für Dich frei sein,
+          wirst Du rechtzeitig per Email informiert.
         </Typography>
         <Typography>
           <Typography as="span" className="text-destructive">
