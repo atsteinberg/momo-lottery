@@ -19,7 +19,7 @@ const HomePage: FC = async () => {
       </div>
       <div className="flex flex-col w-full sm:flex-row gap-4">
         <DateSelection type="lunch" className="sm:w-1/2 w-full" />
-        {/* <DateSelection type="snack" className="sm:w-1/2 w-full" /> */}
+        <DateSelection type="snacks" className="sm:w-1/2 w-full" />
       </div>
     </div>
   );

@@ -35,7 +35,10 @@ const DateSelectionClient: FC<DateSelectionClientProps> = ({
   return (
     <div>
       <div
-        className={cn('flex flex-row justify-between items-center', className)}
+        className={cn(
+          'flex flex-row justify-between items-center mb-4',
+          className,
+        )}
       >
         <Typography as="h4">{config.title}</Typography>
 
@@ -56,7 +59,7 @@ const DateSelectionClient: FC<DateSelectionClientProps> = ({
       </div>
       <div className="flex flex-col gap-2">
         {Array.from({ length: 5 }).map((_, index) => (
-          <DateCard key={index} date={dates[index]} />
+          <DateCard key={index} date={dates[index]} className="h-14" />
         ))}
       </div>
     </div>
