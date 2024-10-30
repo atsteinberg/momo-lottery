@@ -4,9 +4,9 @@ import IconButton from '@/components/ui/icon-button';
 import Typography from '@/components/ui/typography';
 import { PropsWithClassName } from '@/types/react';
 import { cn } from '@/utils/tailwind';
+import { isSameDay } from 'date-fns';
 import { PlusCircle } from 'lucide-react';
 import { FC, useState } from 'react';
-import { toast } from 'sonner';
 import DateCard from '../date-card/date-card';
 import { DateSelectionConfig } from '../date-selection';
 
@@ -14,24 +14,29 @@ type DateSelectionClientProps = PropsWithClassName<{
   config: DateSelectionConfig;
   availableDates: Date[];
   selectedDates: Date[];
+  month: Date;
 }>;
 
-const getFirstAvailableDate = (
+export type DateLike = Date | null | 'new';
+
+const canAddDate = (
+  dates: DateLike[],
   availableDates: Date[],
-  selectedDates: Date[],
-) => {
-  return availableDates
-    .filter((date) => !selectedDates.includes(date))
-    .sort((a, b) => a.getTime() - b.getTime())[0];
-};
+  index?: number,
+) =>
+  dates.length < 5 &&
+  dates.every((date) => date !== 'new' && date !== null) &&
+  dates.length < availableDates.length &&
+  (index === undefined || dates.length === index);
 
 const DateSelectionClient: FC<DateSelectionClientProps> = ({
   config,
   className,
   availableDates,
   selectedDates,
+  month,
 }) => {
-  const [dates, setDates] = useState<Date[]>(selectedDates);
+  const [dates, setDates] = useState<(Date | null | 'new')[]>(selectedDates);
   return (
     <div>
       <div
@@ -45,21 +50,49 @@ const DateSelectionClient: FC<DateSelectionClientProps> = ({
         <IconButton
           icon={<PlusCircle className="h-4 w-4" />}
           onClick={() => {
-            const firstAvailableDate = getFirstAvailableDate(
-              availableDates,
-              dates,
-            );
-            if (!firstAvailableDate) {
-              toast.error('Es gibt keine verfügbaren Tage mehr');
-              return;
-            }
-            setDates([...dates, firstAvailableDate]);
+            setDates([...dates, null]);
           }}
+          disabled={!canAddDate(dates, availableDates)}
         />
       </div>
       <div className="flex flex-col gap-2">
         {Array.from({ length: 5 }).map((_, index) => (
-          <DateCard key={index} date={dates[index]} className="h-14" />
+          <DateCard
+            key={index}
+            date={dates[index]}
+            availableDates={availableDates.filter((date) =>
+              dates.every((day) => day === null || !isSameDay(day, date)),
+            )}
+            className="h-14"
+            month={month}
+            setDate={(date) => {
+              if (date === null) {
+                setDates((prev) => {
+                  const newDates = [...prev];
+                  newDates[index] = null;
+                  return newDates.filter((date) => date !== null);
+                });
+                return;
+              }
+              if (date === 'new') {
+                console.log(index);
+                if (canAddDate(dates, availableDates, index)) {
+                  setDates((prev) => {
+                    const newDates = [...prev];
+                    newDates[index] = null;
+                    return newDates;
+                  });
+                }
+              }
+              if (typeof date === 'object') {
+                setDates((prev) => {
+                  const newDates = [...prev];
+                  newDates[index] = date;
+                  return newDates;
+                });
+              }
+            }}
+          />
         ))}
       </div>
     </div>

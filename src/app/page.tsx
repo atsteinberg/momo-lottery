@@ -10,7 +10,7 @@ const HomePage: FC = async () => {
   const month = getMonth((await db.query.appSettings.findFirst())?.targetMonth);
   const user = await getExistingUser();
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 flex-1">
       <div className="flex flex-row items-center">
         <Typography as="h3">
           An welchem Tag soll {user.child?.name} im {month} fürs Essen sorgen?
