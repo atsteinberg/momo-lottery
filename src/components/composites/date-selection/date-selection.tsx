@@ -40,6 +40,7 @@ const DateSelection: FC<DateSelectionProps> = async ({ type, className }) => {
   return (
     <div className={cn('bg-card rounded-lg p-4', className)}>
       <DateSelectionClient
+        type={type}
         config={config[type]}
         availableDates={[
           new Date('11-01-2024'),

@@ -9,12 +9,14 @@ import { PlusCircle } from 'lucide-react';
 import { FC, useState } from 'react';
 import DateCard from '../date-card/date-card';
 import { DateSelectionConfig } from '../date-selection';
+import { addDate, removeDate } from '../date-selection.actions';
 
 type DateSelectionClientProps = PropsWithClassName<{
   config: DateSelectionConfig;
   availableDates: Date[];
   selectedDates: Date[];
   month: Date;
+  type: 'lunch' | 'snacks';
 }>;
 
 export type DateLike = Date | null | 'new';
@@ -35,6 +37,7 @@ const DateSelectionClient: FC<DateSelectionClientProps> = ({
   availableDates,
   selectedDates,
   month,
+  type,
 }) => {
   const [dates, setDates] = useState<(Date | null | 'new')[]>(selectedDates);
   return (
@@ -67,11 +70,19 @@ const DateSelectionClient: FC<DateSelectionClientProps> = ({
             month={month}
             setDate={(date) => {
               if (date === null) {
+                const oldDate = dates[index];
                 setDates((prev) => {
                   const newDates = [...prev];
-                  newDates[index] = null;
-                  return newDates.filter((date) => date !== null);
+                  newDates.splice(index, 1);
+                  return newDates;
                 });
+                if (oldDate && typeof oldDate === 'object') {
+                  removeDate({
+                    type: type,
+                    targetMonth: month.toISOString(),
+                    date: oldDate,
+                  });
+                }
                 return;
               }
               if (date === 'new') {
@@ -89,6 +100,11 @@ const DateSelectionClient: FC<DateSelectionClientProps> = ({
                   const newDates = [...prev];
                   newDates[index] = date;
                   return newDates;
+                });
+                addDate({
+                  type: type,
+                  targetMonth: month.toISOString(),
+                  date: date,
                 });
               }
             }}
