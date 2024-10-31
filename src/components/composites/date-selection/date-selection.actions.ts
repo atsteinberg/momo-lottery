@@ -3,6 +3,7 @@
 import db from '@/services/db';
 import { mealRequests } from '@/services/db/schema';
 import { getExistingUser } from '@/utils/user';
+import { format } from 'date-fns';
 import { and, eq } from 'drizzle-orm';
 
 type DateActionParams = {
@@ -18,7 +19,7 @@ export async function addDate({ type, targetMonth, date }: DateActionParams) {
     type,
     userId: user.id,
     targetMonth,
-    date: date.toISOString(),
+    date: format(date, "yyyy-MM-dd'T'00:00:00.000'Z'"),
   });
 }
 
