@@ -3,7 +3,7 @@
 import { CalendarIcon } from '@radix-ui/react-icons';
 import { format, isSameDay } from 'date-fns';
 
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
   Popover,
@@ -35,7 +35,7 @@ export function DatePicker({
   const [open, setOpen] = useState(startOpen ?? false);
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <Button variant={'outline'} className="h-14">
+      <div className={cn(buttonVariants({ variant: 'outline' }), className)}>
         <PopoverTrigger asChild className="flex grow">
           <Button
             variant={'ghost'}
@@ -56,7 +56,7 @@ export function DatePicker({
         {date && (
           <Button
             variant={'ghost'}
-            className="right-0 h-14 z-50"
+            className="right-0 h-full z-10"
             onClick={() => {
               setDate(null);
               setOpen(false);
@@ -65,7 +65,7 @@ export function DatePicker({
             <Trash className="h-4 w-4" />
           </Button>
         )}
-      </Button>
+      </div>
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
           mode="single"
