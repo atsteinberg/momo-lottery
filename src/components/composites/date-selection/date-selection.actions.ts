@@ -12,9 +12,8 @@ type DateActionParams = {
   date: Date;
 };
 
-const user = await getExistingUser();
-
 export async function addDate({ type, targetMonth, date }: DateActionParams) {
+  const user = await getExistingUser();
   if (!user.childId) throw new Error('No child ID found');
 
   await db.insert(mealRequests).values({
@@ -31,12 +30,14 @@ export async function removeDate({
   targetMonth,
   date,
 }: DateActionParams) {
+  const user = await getExistingUser();
+  if (!user.childId) throw new Error('No child ID found');
   await db
     .delete(mealRequests)
     .where(
       and(
         eq(mealRequests.type, type),
-        eq(mealRequests.userId, user.id),
+        eq(mealRequests.childId, user.childId),
         eq(mealRequests.targetMonth, getDateString(targetMonth)),
         eq(mealRequests.date, getDateString(date)),
       ),

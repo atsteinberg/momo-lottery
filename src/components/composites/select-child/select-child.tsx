@@ -16,14 +16,15 @@ import { FC } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { registerUser } from './select-child.actions';
+import { registerUser, sendVerificationEmail } from './select-child.actions';
 import { FormSchema, SelectChildFormValues } from './select-child.schema';
 
 type SelectChildProps = {
   kids: { id: string; name: string }[];
+  userEmail: string;
 };
 
-const SelectChild: FC<SelectChildProps> = ({ kids }) => {
+const SelectChild: FC<SelectChildProps> = ({ kids, userEmail }) => {
   const router = useRouter();
   const form = useForm<SelectChildFormValues>({
     resolver: zodResolver(FormSchema),
@@ -32,6 +33,10 @@ const SelectChild: FC<SelectChildProps> = ({ kids }) => {
     const kid = await registerUser(data);
     toast('Kind ausgewählt', {
       description: `Du hast folgendes Kind ausgewählt: ${kid.childName}`,
+    });
+    await sendVerificationEmail({
+      userEmail,
+      childName: kid.childName,
     });
     router.push('/unverified');
   };

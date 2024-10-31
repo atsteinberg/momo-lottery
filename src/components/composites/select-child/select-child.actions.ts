@@ -3,9 +3,12 @@
 import db from '@/services/db';
 
 import { children, users } from '@/services/db/schema';
+import { sendEmail } from '@/services/db/sendgrid';
 import { currentUser } from '@clerk/nextjs/server';
-import { sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { FormSchema, SelectChildFormValues } from './select-child.schema';
+
+const sendGridSender = process.env.SENDGRID_VERIFIED_EMAIL;
 
 const addNewKid = async (name?: string) => {
   if (!name) {
@@ -37,7 +40,56 @@ export const registerUser = async (data: SelectChildFormValues) => {
       isVerified: false,
     })
     .returning({
-      childName: sql`(SELECT ${children.name} FROM ${children} WHERE ${children.id} = ${kidId})`,
+      childName: sql<string>`(SELECT ${children.name} FROM ${children} WHERE ${children.id} = ${kidId})`,
     });
   return result;
+};
+
+export const sendVerificationEmail = async ({
+  userEmail,
+  childName,
+}: {
+  userEmail: string;
+  childName: string;
+}) => {
+  const emails = await db
+    .select({ email: users.email })
+    .from(users)
+    .where(eq(users.isAdmin, true));
+  if (!sendGridSender) {
+    throw new Error('SENDGRID_VERIFIED_EMAIL is not defined');
+  }
+  try {
+    await Promise.all(
+      emails.map(async ({ email }) => {
+        console.log('Sending email to', email);
+        try {
+          const msg = {
+            to: email,
+            from: sendGridSender,
+            subject: 'Neue Registrierungsanfrage',
+            html: `
+              <p>Eine neue Registrierungsanfrage ist eingegangen:</p>
+              <p>Kind: ${childName}</p>
+              <p>Nutzeremail: ${userEmail}</p>
+            `,
+          };
+
+          const response = await sendEmail(msg);
+          console.log('Email sent successfully', response);
+        } catch (error) {
+          console.error('Failed to send email', {
+            error,
+            email,
+            childName,
+            userEmail,
+          });
+          throw error;
+        }
+      }),
+    );
+  } catch (error) {
+    console.error('Failed to send emails', { error });
+    throw error;
+  }
 };

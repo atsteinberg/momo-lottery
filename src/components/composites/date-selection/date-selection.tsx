@@ -24,6 +24,7 @@ const config = {
 
 const DateSelection: FC<DateSelectionProps> = async ({ type, className }) => {
   const user = await getExistingUser();
+  if (!user.childId) throw new Error('No child ID found');
   const [{ targetMonth }] = await db
     .select({ targetMonth: appSettings.targetMonth })
     .from(appSettings);
@@ -33,7 +34,7 @@ const DateSelection: FC<DateSelectionProps> = async ({ type, className }) => {
     .where(
       and(
         eq(mealRequests.type, type),
-        eq(mealRequests.userId, user.id),
+        eq(mealRequests.childId, user.childId),
         eq(mealRequests.targetMonth, targetMonth),
       ),
     );
