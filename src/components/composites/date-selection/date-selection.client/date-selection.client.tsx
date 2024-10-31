@@ -79,14 +79,13 @@ const DateSelectionClient: FC<DateSelectionClientProps> = ({
                 if (oldDate && typeof oldDate === 'object') {
                   removeDate({
                     type: type,
-                    targetMonth: month.toISOString(),
+                    targetMonth: month,
                     date: oldDate,
                   });
                 }
                 return;
               }
               if (date === 'new') {
-                console.log(index);
                 if (canAddDate(dates, availableDates, index)) {
                   setDates((prev) => {
                     const newDates = [...prev];
@@ -103,7 +102,7 @@ const DateSelectionClient: FC<DateSelectionClientProps> = ({
                 });
                 addDate({
                   type: type,
-                  targetMonth: month.toISOString(),
+                  targetMonth: month,
                   date: date,
                 });
               }

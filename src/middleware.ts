@@ -8,7 +8,6 @@ export default clerkMiddleware(async (auth, req) => {
     req.nextUrl.pathname === '/register' ||
     req.nextUrl.pathname === '/unverified'
   ) {
-    console.log('skipping onboarding check');
     return NextResponse.next();
   }
   const { userId } = auth();
@@ -16,7 +15,6 @@ export default clerkMiddleware(async (auth, req) => {
     const response = await fetch(`http://localhost:3000/api/users/${userId}`);
     if (response.ok) {
       const user = await response.json();
-      console.log({ user });
       if (!user) {
         return NextResponse.redirect(new URL('/register', req.url));
       }

@@ -1,9 +1,33 @@
 {
-  "id": "ca702d08-0fa0-4646-8a7f-3658ad08bb31",
+  "id": "64731cd6-48b8-40e1-a922-66147d041bd9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.app_settings": {
+      "name": "app_settings",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "target_month": {
+          "name": "target_month",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
     "public.children": {
       "name": "children",
       "schema": "",
@@ -20,12 +44,6 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
-        },
-        "google_sheets_name": {
-          "name": "google_sheets_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
         }
       },
       "indexes": {},
@@ -34,50 +52,78 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "public.user_children": {
-      "name": "user_children",
+    "public.meal_requests": {
+      "name": "meal_requests",
       "schema": "",
       "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "date": {
+          "name": "date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "target_month": {
+          "name": "target_month",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
         "user_id": {
           "name": "user_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "child_id": {
           "name": "child_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
+        },
+        "meal_type": {
+          "name": "meal_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "user_children_user_id_users_id_fk": {
-          "name": "user_children_user_id_users_id_fk",
-          "tableFrom": "user_children",
+        "meal_requests_user_id_users_id_fk": {
+          "name": "meal_requests_user_id_users_id_fk",
+          "tableFrom": "meal_requests",
           "tableTo": "users",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "user_children_child_id_children_id_fk": {
-          "name": "user_children_child_id_children_id_fk",
-          "tableFrom": "user_children",
+        "meal_requests_child_id_children_id_fk": {
+          "name": "meal_requests_child_id_children_id_fk",
+          "tableFrom": "meal_requests",
           "tableTo": "children",
-          "columnsFrom": ["child_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "child_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {
-        "user_children_user_id_child_id_pk": {
-          "name": "user_children_user_id_child_id_pk",
-          "columns": ["user_id", "child_id"]
-        }
-      },
+      "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
@@ -92,8 +138,14 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "name": {
-          "name": "name",
+        "first_name": {
+          "name": "first_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_name": {
+          "name": "last_name",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -109,21 +161,59 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "child_id": {
+          "name": "child_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_verified": {
+          "name": "is_verified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "is_admin": {
+          "name": "is_admin",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "users_child_id_children_id_fk": {
+          "name": "users_child_id_children_id_fk",
+          "tableFrom": "users",
+          "tableTo": "children",
+          "columnsFrom": [
+            "child_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": ["email"]
+          "columns": [
+            "email"
+          ]
         },
         "users_clerk_id_unique": {
           "name": "users_clerk_id_unique",
           "nullsNotDistinct": false,
-          "columns": ["clerk_id"]
+          "columns": [
+            "clerk_id"
+          ]
         }
       },
       "checkConstraints": {}

@@ -7,6 +7,8 @@ export const getDate = (date: string | number | Date) => {
     : date;
 };
 
+export const getDateString = (date: Date) => format(date, 'yyyy-MM-dd');
+
 export const getMonth = (date?: string | number | Date) => {
   if (!date) {
     throw new Error('No date provided to getMonth');

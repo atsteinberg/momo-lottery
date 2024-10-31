@@ -2,24 +2,27 @@
 
 import db from '@/services/db';
 import { mealRequests } from '@/services/db/schema';
+import { getDateString } from '@/utils/dates';
 import { getExistingUser } from '@/utils/user';
-import { format } from 'date-fns';
 import { and, eq } from 'drizzle-orm';
 
 type DateActionParams = {
   type: 'lunch' | 'snacks';
-  targetMonth: string;
+  targetMonth: Date;
   date: Date;
 };
 
 const user = await getExistingUser();
 
 export async function addDate({ type, targetMonth, date }: DateActionParams) {
+  if (!user.childId) throw new Error('No child ID found');
+
   await db.insert(mealRequests).values({
-    type,
+    type: type,
     userId: user.id,
-    targetMonth,
-    date: format(date, "yyyy-MM-dd'T'00:00:00.000'Z'"),
+    targetMonth: getDateString(targetMonth),
+    date: getDateString(date),
+    childId: user.childId,
   });
 }
 
@@ -34,8 +37,8 @@ export async function removeDate({
       and(
         eq(mealRequests.type, type),
         eq(mealRequests.userId, user.id),
-        eq(mealRequests.targetMonth, targetMonth),
-        eq(mealRequests.date, date.toISOString()),
+        eq(mealRequests.targetMonth, getDateString(targetMonth)),
+        eq(mealRequests.date, getDateString(date)),
       ),
     );
 }

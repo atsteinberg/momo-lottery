@@ -1,12 +1,5 @@
 import { relations } from 'drizzle-orm';
-import {
-  boolean,
-  date,
-  pgTable,
-  text,
-  uuid,
-  varchar,
-} from 'drizzle-orm/pg-core';
+import { boolean, pgTable, text, uuid, varchar } from 'drizzle-orm/pg-core';
 
 export type MealRequestType = 'lunch' | 'snacks';
 
@@ -39,15 +32,20 @@ export const childrenRelations = relations(children, ({ many }) => ({
 
 export const appSettings = pgTable('app_settings', {
   id: uuid('id').primaryKey().defaultRandom(),
-  targetMonth: date('target_month').notNull(),
+  targetMonth: text('target_month').notNull(),
 });
 
 export const mealRequests = pgTable('meal_requests', {
   id: uuid('id').primaryKey().defaultRandom(),
-  date: date('date').notNull(),
-  targetMonth: date('target_month'),
+  date: text('date').notNull(),
+  targetMonth: text('target_month').notNull(),
   userId: uuid('user_id').references(() => users.id),
+  childId: uuid('child_id')
+    .references(() => children.id)
+    .notNull(),
   type: text('meal_type', {
     enum: ['lunch', 'snacks'],
-  }).$type<MealRequestType>(),
+  })
+    .$type<MealRequestType>()
+    .notNull(),
 });
