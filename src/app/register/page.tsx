@@ -12,7 +12,7 @@ const RegisterPage = async () => {
   }
   return (
     <div className="mt-20 flex flex-1 flex-col items-center">
-      <div className="bg-slate-300 rounded-lg p-8 flex flex-col justify-center items-center shadow-md gap-4">
+      <div className="bg-slate-300 rounded-lg p-8 flex flex-col shadow-md gap-4">
         <Typography as="h3">
           Sieht so aus, als wärst Du das erste Mal hier.
         </Typography>
