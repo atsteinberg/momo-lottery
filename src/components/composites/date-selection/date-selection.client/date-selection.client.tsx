@@ -7,6 +7,7 @@ import { cn } from '@/utils/tailwind';
 import { isSameDay } from 'date-fns';
 import { PlusCircle } from 'lucide-react';
 import { FC, useState } from 'react';
+import { toast } from 'sonner';
 import DateCard from '../date-card/date-card';
 import { DateSelectionConfig } from '../date-selection';
 import { addDate, removeDate } from '../date-selection.actions';
@@ -29,7 +30,7 @@ const canAddDate = (
   dates.length < 5 &&
   dates.every((date) => date !== 'new' && date !== null) &&
   dates.length < availableDates.length &&
-  (index === undefined || dates.length === index);
+  (!index || index === dates.length);
 
 const DateSelectionClient: FC<DateSelectionClientProps> = ({
   config,
@@ -51,11 +52,20 @@ const DateSelectionClient: FC<DateSelectionClientProps> = ({
         <Typography as="h4">{config.title}</Typography>
 
         <IconButton
+          className="disabled:text-muted-foreground"
           icon={<PlusCircle className="h-4 w-4" />}
           onClick={() => {
+            if (dates.some((date) => date === 'new')) {
+              toast.error('Bitte wähle einen Termin aus.');
+              return;
+            }
+            if (dates.length >= availableDates.length) {
+              toast.error('Es sind keine weiteren Termine verfügbar.');
+              return;
+            }
             setDates([...dates, null]);
           }}
-          disabled={!canAddDate(dates, availableDates)}
+          disabled={dates.length >= 5}
         />
       </div>
       <div className="flex flex-col gap-2">

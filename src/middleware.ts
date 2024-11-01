@@ -4,10 +4,7 @@ import { NextResponse } from 'next/server';
 export default clerkMiddleware(async (auth, req) => {
   const { userId } = auth();
   if (!userId) {
-    if (
-      !req.nextUrl.pathname.startsWith('/api/users') &&
-      req.nextUrl.pathname !== '/unverified'
-    ) {
+    if (!req.nextUrl.pathname.startsWith('/api/users')) {
       auth().protect();
     }
     return NextResponse.next();
