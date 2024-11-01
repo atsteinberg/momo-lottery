@@ -1,4 +1,4 @@
-import LinkButton from '@/components/composites/link-button';
+import VerificationCheckButton from '@/components/composites/verification-check-button/verification-check-button';
 import Typography from '@/components/ui/typography';
 
 const UnverifiedPage = () => {
@@ -11,7 +11,7 @@ const UnverifiedPage = () => {
         Bitte hab noch ein wenig Geduld und versuche es in ein paar Tagen noch
         einmal.
       </Typography>
-      <LinkButton href="/">Versuch&apos;s noch einmal</LinkButton>
+      <VerificationCheckButton className="w-fit" />
     </div>
   );
 };
