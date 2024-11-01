@@ -8,8 +8,6 @@ import { currentUser } from '@clerk/nextjs/server';
 import { eq, sql } from 'drizzle-orm';
 import { FormSchema, SelectChildFormValues } from './select-child.schema';
 
-const sendGridSender = process.env.SENDGRID_VERIFIED_EMAIL;
-
 const addNewKid = async (name?: string) => {
   if (!name) {
     throw new Error('New kid name is required');
@@ -56,17 +54,12 @@ export const sendVerificationEmail = async ({
     .select({ email: users.email })
     .from(users)
     .where(eq(users.isAdmin, true));
-  if (!sendGridSender) {
-    throw new Error('SENDGRID_VERIFIED_EMAIL is not defined');
-  }
   try {
     await Promise.all(
       emails.map(async ({ email }) => {
-        console.log('Sending email to', email);
         try {
           const msg = {
             to: email,
-            from: sendGridSender,
             subject: 'Neue Registrierungsanfrage',
             html: `
               <p>Eine neue Registrierungsanfrage ist eingegangen:</p>

@@ -1,15 +1,21 @@
 import sgMail from '@sendgrid/mail';
 
-export async function sendEmail(msg: sgMail.MailDataRequired) {
-  console.log('Attempting to send email with config:', {
-    apiKeyExists: !!process.env.SENDGRID_API_KEY,
-    to: msg.to,
-    from: msg.from,
-  });
+const sender = process.env.SENDGRID_VERIFIED_EMAIL;
+const apiKey = process.env.SENDGRID_API_KEY;
+
+export async function sendEmail(
+  msg: Omit<sgMail.MailDataRequired, 'from'> &
+    ({ text: string } | { html: string }),
+) {
+  if (!sender || !apiKey) {
+    throw new Error(
+      'SENDGRID_VERIFIED_EMAIL or SENDGRID_API_KEY is not defined',
+    );
+  }
 
   try {
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY ?? '');
-    const response = await sgMail.send(msg);
+    sgMail.setApiKey(apiKey);
+    const response = await sgMail.send({ from: sender, ...msg });
     console.log('SendGrid response:', response);
     return response;
   } catch (error) {
