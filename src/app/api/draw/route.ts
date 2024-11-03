@@ -1,9 +1,19 @@
 import db from '@/services/db';
-import { mealRequests, users } from '@/services/db/schema';
+import { appSettings, mealRequests, users } from '@/services/db/schema';
 import { sendEmail } from '@/services/db/sendgrid';
+import { getMonthDateString } from '@/utils/dates';
+import { draw, preDraw } from '@/utils/draws';
+import { addMonths } from 'date-fns';
 import { eq } from 'drizzle-orm';
+import { revalidatePath } from 'next/cache';
 import type { NextRequest } from 'next/server';
-import { draw, preDraw } from './route.utils';
+
+const updateAppSettingsToNextMonth = async (targetMonth: string) => {
+  await db
+    .update(appSettings)
+    .set({ targetMonth: getMonthDateString(addMonths(targetMonth, 1)) });
+  revalidatePath('/');
+};
 
 export const GET = async (request: NextRequest) => {
   const authHeader = request.headers.get('authorization');
@@ -12,7 +22,13 @@ export const GET = async (request: NextRequest) => {
       status: 401,
     });
   }
-  // TODO change appsettings for next month and revalidate home page
+  const [{ targetMonth }] = await db
+    .select({
+      targetMonth: appSettings.targetMonth,
+    })
+    .from(appSettings);
+  await updateAppSettingsToNextMonth(targetMonth);
+
   const requests = await db
     .select({
       childId: mealRequests.childId,
@@ -23,7 +39,10 @@ export const GET = async (request: NextRequest) => {
       date: mealRequests.date,
     })
     .from(mealRequests)
-    .innerJoin(users, eq(users.id, mealRequests.userId));
+    .innerJoin(users, eq(users.id, mealRequests.userId))
+    .where(eq(mealRequests.targetMonth, targetMonth));
+
+  // changing appSettings to next month
 
   const { lottery, childrenEmails } = requests.reduce<{
     lottery: {
@@ -71,7 +90,7 @@ export const GET = async (request: NextRequest) => {
     sendEmail({
       to: email,
       subject: 'Die Essenslotterieergebnisse sind da!',
-      text: `Hi ${firstName},\n\nDie Ergebnisse der Essenslotterie sind da:\n\n${lunchText}\n${snackText}`,
+      text: `Hi ${firstName},\n\nDie Ergebnisse der Essenslotterie sind da:\n\n${lunchText}\n${snackText}\n\nBitte trage wie gehabt Dein Menü bei Google Sheets ein, sobald das Sheet verfügbar ist (ab ca. 9 Uhr am 15.).`,
     });
 
     // TODO add results to google docs

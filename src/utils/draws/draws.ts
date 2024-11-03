@@ -11,18 +11,30 @@ export const draw = ({
       results,
     };
   }
-  const draws = Object.entries(openDraws).filter(([date]) =>
-    Object.values(results).includes(date),
+  const draws = Object.entries(openDraws).filter(
+    ([date]) => !Object.values(results).includes(date),
   );
+  if (draws.length === 0) {
+    return {
+      openDraws: {},
+      results,
+    };
+  }
   const dateIndex = Math.floor(Math.random() * draws.length);
   const [date, candidates] = draws[dateIndex];
   const filteredCandidates = candidates.filter(
     (candidate) => !Object.keys(results).includes(candidate),
   );
+  if (filteredCandidates.length === 0) {
+    return {
+      openDraws: Object.fromEntries(draws.toSpliced(dateIndex, 1)),
+      results,
+    };
+  }
   const childIndex = Math.floor(Math.random() * filteredCandidates.length);
   const selectedChildId = filteredCandidates[childIndex];
   return {
-    openDraws: Object.fromEntries(draws.splice(dateIndex, 1)),
+    openDraws: Object.fromEntries(draws.toSpliced(dateIndex, 1)),
     results: { ...results, [selectedChildId]: date },
   };
 };

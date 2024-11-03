@@ -15,3 +15,10 @@ export const getMonth = (date?: string | number | Date) => {
   }
   return format(date, 'MMMM', { locale: deAT });
 };
+
+export const getMonthDateString = (date?: string | number | Date) => {
+  if (!date) {
+    throw new Error('No date provided to getMonthString');
+  }
+  return format(date, 'yyyy-MM');
+};
