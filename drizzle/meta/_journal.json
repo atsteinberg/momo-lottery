@@ -15,6 +15,20 @@
       "when": 1730445982275,
       "tag": "0001_cooing_stingray",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1730663507684,
+      "tag": "0002_thankful_whirlwind",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1730663652087,
+      "tag": "0003_rainy_speed",
+      "breakpoints": true
     }
   ]
 }

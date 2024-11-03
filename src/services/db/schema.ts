@@ -1,6 +1,7 @@
 import { relations } from 'drizzle-orm';
 import {
   boolean,
+  date,
   pgTable,
   text,
   timestamp,
@@ -46,6 +47,7 @@ export const appSettings = pgTable('app_settings', {
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
   targetMonth: text('target_month').notNull(),
+  deadline: date('deadline', { mode: 'date' }).notNull(),
 });
 
 export const mealRequests = pgTable('meal_requests', {

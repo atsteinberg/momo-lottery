@@ -8,10 +8,14 @@ import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import type { NextRequest } from 'next/server';
 
-const updateAppSettingsToNextMonth = async (targetMonth: string) => {
-  await db
-    .update(appSettings)
-    .set({ targetMonth: getMonthDateString(addMonths(targetMonth, 1)) });
+const updateAppSettingsToNextMonth = async (
+  targetMonth: string,
+  deadline: Date,
+) => {
+  await db.update(appSettings).set({
+    targetMonth: getMonthDateString(addMonths(targetMonth, 1)),
+    deadline: addMonths(deadline, 1),
+  });
   revalidatePath('/');
 };
 
@@ -22,12 +26,19 @@ export const GET = async (request: NextRequest) => {
       status: 401,
     });
   }
-  const [{ targetMonth }] = await db
+  const [{ targetMonth, deadline }] = await db
     .select({
       targetMonth: appSettings.targetMonth,
+      deadline: appSettings.deadline,
     })
     .from(appSettings);
-  await updateAppSettingsToNextMonth(targetMonth);
+
+  if (deadline > new Date()) {
+    // deadline later than now, do nothing
+    return Response.json({ success: true });
+  }
+
+  await updateAppSettingsToNextMonth(targetMonth, deadline);
 
   const requests = await db
     .select({
