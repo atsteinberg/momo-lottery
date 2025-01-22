@@ -2,9 +2,11 @@ import { relations } from 'drizzle-orm';
 import {
   boolean,
   date,
+  integer,
   pgTable,
   text,
   timestamp,
+  unique,
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core';
@@ -66,3 +68,23 @@ export const mealRequests = pgTable('meal_requests', {
     .$type<MealRequestType>()
     .notNull(),
 });
+
+export const mealDays = pgTable(
+  'meal_days',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    createdAt: timestamp('created_at').defaultNow(),
+    updatedAt: timestamp('updated_at').defaultNow(),
+    year: integer('year').notNull(),
+    month: integer('month').notNull(),
+    day: integer('day').notNull(),
+    type: text('meal_type', {
+      enum: ['lunch', 'snacks'],
+    })
+      .$type<MealRequestType>()
+      .notNull(),
+  },
+  (table) => ({
+    unq: unique().on(table.year, table.month, table.day, table.type),
+  }),
+);
