@@ -13,7 +13,7 @@ const HomePage: FC = async () => {
     (
       await db
         .select({
-          date: sql<string>`${appSettings.targetYear}-${appSettings.targetMonth}`,
+          date: sql<string>`CONCAT(${appSettings.targetYear}, '-', LPAD(${appSettings.targetMonth}::text, 2, '0'))`,
         })
         .from(appSettings)
     )[0].date,
