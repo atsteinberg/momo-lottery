@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1730379882906,
-      "tag": "0000_odd_slayback",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1730445982275,
-      "tag": "0001_cooing_stingray",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1730663507684,
-      "tag": "0002_thankful_whirlwind",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1730663652087,
-      "tag": "0003_rainy_speed",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1737579270701,
-      "tag": "0004_numerous_klaw",
+      "when": 1737624282508,
+      "tag": "0000_clammy_whirlwind",
       "breakpoints": true
     }
   ]

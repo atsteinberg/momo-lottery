@@ -1,1 +1,0 @@
-ALTER TABLE "app_settings" ALTER COLUMN "deadline" SET DATA TYPE date USING deadline::date;

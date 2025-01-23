@@ -88,8 +88,7 @@ const DateSelectionClient: FC<DateSelectionClientProps> = ({
                 });
                 if (oldDate && typeof oldDate === 'object') {
                   removeDate({
-                    type: type,
-                    targetMonth: month,
+                    type,
                     date: oldDate,
                   });
                 }
@@ -111,9 +110,8 @@ const DateSelectionClient: FC<DateSelectionClientProps> = ({
                   return newDates;
                 });
                 addDate({
-                  type: type,
-                  targetMonth: month,
-                  date: date,
+                  type,
+                  date,
                 });
               }
             }}

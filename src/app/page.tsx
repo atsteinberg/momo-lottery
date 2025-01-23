@@ -2,12 +2,22 @@ import DateSelection from '@/components/composites/date-selection/date-selection
 import RulesInfo from '@/components/composites/rules-info';
 import Typography from '@/components/ui/typography/typography';
 import db from '@/services/db';
+import { appSettings } from '@/services/db/schema';
 import { getMonth } from '@/utils/dates';
 import { getExistingUser } from '@/utils/user';
+import { sql } from 'drizzle-orm';
 import { FC } from 'react';
 
 const HomePage: FC = async () => {
-  const month = getMonth((await db.query.appSettings.findFirst())?.targetMonth);
+  const month = getMonth(
+    (
+      await db
+        .select({
+          date: sql<string>`${appSettings.targetYear}-${appSettings.targetMonth}`,
+        })
+        .from(appSettings)
+    )[0].date,
+  );
   const user = await getExistingUser();
   return (
     <div className="flex flex-col gap-4 flex-1">

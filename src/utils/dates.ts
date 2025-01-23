@@ -9,7 +9,8 @@ export const getDate = (date: string | number | Date) => {
 
 export const getDateString = (date: Date) => format(date, 'yyyy-MM-dd');
 
-export const getMonth = (date?: string | number | Date) => {
+export const getMonth = (dateString: string) => {
+  const date = new Date(dateString);
   if (!date) {
     throw new Error('No date provided to getMonth');
   }
@@ -21,4 +22,11 @@ export const getMonthDateString = (date?: string | number | Date) => {
     throw new Error('No date provided to getMonthString');
   }
   return format(date, 'yyyy-MM');
+};
+
+export const getNormalizedTargetYear = (
+  targetYear: number,
+  targetMonth: number,
+) => {
+  return targetMonth && targetMonth < 9 ? targetYear + 1 : targetYear;
 };

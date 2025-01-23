@@ -1,1 +1,0 @@
-ALTER TABLE "app_settings" ADD COLUMN "deadline" text NOT NULL;

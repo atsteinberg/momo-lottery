@@ -1,5 +1,5 @@
 {
-  "id": "64731cd6-48b8-40e1-a922-66147d041bd9",
+  "id": "3047a649-f745-46fb-bdae-a8a5dafc650d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -15,9 +15,35 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
         "target_month": {
           "name": "target_month",
-          "type": "text",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "target_year": {
+          "name": "target_year",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "deadline": {
+          "name": "deadline",
+          "type": "date",
           "primaryKey": false,
           "notNull": true
         }
@@ -39,6 +65,20 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
         "name": {
           "name": "name",
           "type": "text",
@@ -49,6 +89,131 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "public.meal_days": {
+      "name": "meal_days",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "year": {
+          "name": "year",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "month": {
+          "name": "month",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "day": {
+          "name": "day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "meal_type": {
+          "name": "meal_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "meal_days_year_month_day_meal_type_unique": {
+          "name": "meal_days_year_month_day_meal_type_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "year",
+            "month",
+            "day",
+            "meal_type"
+          ]
+        }
+      },
+      "checkConstraints": {}
+    },
+    "public.meal_request_meal_days": {
+      "name": "meal_request_meal_days",
+      "schema": "",
+      "columns": {
+        "meal_request_id": {
+          "name": "meal_request_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "meal_day_id": {
+          "name": "meal_day_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "meal_request_meal_days_meal_request_id_meal_requests_id_fk": {
+          "name": "meal_request_meal_days_meal_request_id_meal_requests_id_fk",
+          "tableFrom": "meal_request_meal_days",
+          "tableTo": "meal_requests",
+          "columnsFrom": [
+            "meal_request_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "meal_request_meal_days_meal_day_id_meal_days_id_fk": {
+          "name": "meal_request_meal_days_meal_day_id_meal_days_id_fk",
+          "tableFrom": "meal_request_meal_days",
+          "tableTo": "meal_days",
+          "columnsFrom": [
+            "meal_day_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "meal_request_meal_days_meal_request_id_meal_day_id_pk": {
+          "name": "meal_request_meal_days_meal_request_id_meal_day_id_pk",
+          "columns": [
+            "meal_request_id",
+            "meal_day_id"
+          ]
+        }
+      },
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
@@ -63,17 +228,19 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "date": {
-          "name": "date",
-          "type": "text",
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false,
+          "default": "now()"
         },
-        "target_month": {
-          "name": "target_month",
-          "type": "text",
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false,
+          "default": "now()"
         },
         "user_id": {
           "name": "user_id",
@@ -84,12 +251,6 @@
         "child_id": {
           "name": "child_id",
           "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "meal_type": {
-          "name": "meal_type",
-          "type": "text",
           "primaryKey": false,
           "notNull": true
         }
@@ -137,6 +298,20 @@
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
         },
         "first_name": {
           "name": "first_name",

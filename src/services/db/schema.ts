@@ -4,6 +4,7 @@ import {
   date,
   integer,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   unique,
@@ -48,7 +49,8 @@ export const appSettings = pgTable('app_settings', {
   id: uuid('id').primaryKey().defaultRandom(),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
-  targetMonth: text('target_month').notNull(),
+  targetMonth: integer('target_month').notNull(),
+  targetYear: integer('target_year').notNull(),
   deadline: date('deadline', { mode: 'date' }).notNull(),
 });
 
@@ -56,18 +58,40 @@ export const mealRequests = pgTable('meal_requests', {
   id: uuid('id').primaryKey().defaultRandom(),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
-  date: text('date').notNull(),
-  targetMonth: text('target_month').notNull(),
   userId: uuid('user_id').references(() => users.id),
   childId: uuid('child_id')
     .references(() => children.id)
     .notNull(),
-  type: text('meal_type', {
-    enum: ['lunch', 'snacks'],
-  })
-    .$type<MealRequestType>()
-    .notNull(),
 });
+
+export const mealRequestMealDays = pgTable(
+  'meal_request_meal_days',
+  {
+    mealRequestId: uuid('meal_request_id')
+      .notNull()
+      .references(() => mealRequests.id),
+    mealDayId: uuid('meal_day_id')
+      .notNull()
+      .references(() => mealDays.id),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.mealRequestId, t.mealDayId] }),
+  }),
+);
+
+export const mealRequestMealDaysRelations = relations(
+  mealRequestMealDays,
+  ({ one }) => ({
+    mealRequest: one(mealRequests, {
+      fields: [mealRequestMealDays.mealRequestId],
+      references: [mealRequests.id],
+    }),
+    mealDay: one(mealDays, {
+      fields: [mealRequestMealDays.mealDayId],
+      references: [mealDays.id],
+    }),
+  }),
+);
 
 export const mealDays = pgTable(
   'meal_days',
@@ -85,6 +109,19 @@ export const mealDays = pgTable(
       .notNull(),
   },
   (table) => ({
-    unq: unique().on(table.year, table.month, table.day, table.type),
+    uniqueDatePerType: unique().on(
+      table.year,
+      table.month,
+      table.day,
+      table.type,
+    ),
   }),
 );
+
+export const mealRequestRelations = relations(mealRequests, ({ many }) => ({
+  mealRequestMealDays: many(mealRequestMealDays),
+}));
+
+export const mealDaysRelations = relations(mealDays, ({ many }) => ({
+  mealRequestMealDays: many(mealRequestMealDays),
+}));
