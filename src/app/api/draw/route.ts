@@ -6,6 +6,7 @@ import {
   mealRequests,
   users,
 } from '@/services/db/schema';
+import { sendEmail } from '@/services/db/sendgrid';
 import { getYearFromTargetMonthAndYear } from '@/utils/dates';
 import { draw, preDraw } from '@/utils/draws';
 import { addMonths } from 'date-fns';
@@ -81,15 +82,29 @@ export const GET = async (request: NextRequest) => {
       lunch: { [date: string]: { childId: string; mealRequestId: string }[] };
       snacks: { [date: string]: { childId: string; mealRequestId: string }[] };
     };
-    childrenEmails: { [childId: string]: Set<[string, string]> };
+    childrenEmails: {
+      [childId: string]: { email: string; firstName: string }[];
+    };
   }>(
     (acc, { childId, day, month, year, user, mealRequestId, type }) => {
       const date = `${year}-${month}-${day}`;
-      const childEmails = acc.childrenEmails[childId]
-        ? acc.childrenEmails[childId]
-        : new Set<[string, string]>();
-      childEmails.add([user.email, user.firstName ?? 'Anonymer Nutzer']);
-      const childrenEmails = { ...acc.childrenEmails, [childId]: childEmails };
+      const existingEmails = acc.childrenEmails[childId] || [];
+      const newEmailEntry = {
+        email: user.email,
+        firstName: user.firstName ?? 'Anonymer Nutzer',
+      };
+      const hasExistingEntry = existingEmails.some(
+        (entry) =>
+          entry.email === newEmailEntry.email &&
+          entry.firstName === newEmailEntry.firstName,
+      );
+      const childrenEmails = {
+        ...acc.childrenEmails,
+        [childId]: hasExistingEntry
+          ? existingEmails
+          : [...existingEmails, newEmailEntry],
+      };
+
       if (type === 'lunch') {
         return {
           lottery: {
@@ -128,7 +143,7 @@ export const GET = async (request: NextRequest) => {
     lunchResults,
   });
   const { results: snackResults } = draw(preDrawResults);
-  for (const [childId, [email, firstName]] of Object.entries(childrenEmails)) {
+  for (const [childId, emails] of Object.entries(childrenEmails)) {
     const assignedLunchDate = lunchResults[childId];
     const assignedSnackDate = snackResults[childId];
     const lunchText = assignedLunchDate
@@ -137,12 +152,13 @@ export const GET = async (request: NextRequest) => {
     const snackText = assignedSnackDate
       ? `Gezogener Jausentermin: ${assignedSnackDate.date}`
       : 'Leider konnte euch kein Jausentermin zugewiesen werden.';
-    console.log({ email, firstName, lunchText, snackText });
-    // sendEmail({
-    //   to: email,
-    //   subject: 'Die Essenslotterieergebnisse sind da!',
-    //   text: `Hi ${firstName},\n\nDie Ergebnisse der Essenslotterie sind da:\n\n${lunchText}\n${snackText}\n\nBitte trage wie gehabt Dein Menü bei Google Sheets ein, sobald das Sheet verfügbar ist (ab ca. 9 Uhr am 15.).`,
-    // });
+    emails.forEach(async ({ email, firstName }) => {
+      await sendEmail({
+        to: email,
+        subject: 'Die Essenslotterieergebnisse sind da!',
+        text: `Hi ${firstName},\n\nDie Ergebnisse der Essenslotterie sind da:\n\n${lunchText}\n${snackText}\n\nBitte tragt wie gehabt euer Menü bei Google Sheets ein. Das Sheet ist ab jetzt verfügbar.`,
+      });
+    });
     if (assignedLunchDate) {
       await db
         .update(mealRequests)
