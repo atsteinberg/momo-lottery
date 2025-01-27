@@ -6,7 +6,6 @@ import {
   mealRequests,
   users,
 } from '@/services/db/schema';
-import { sendEmail } from '@/services/db/sendgrid';
 import { getYearFromTargetMonthAndYear } from '@/utils/dates';
 import { draw, preDraw } from '@/utils/draws';
 import { addMonths } from 'date-fns';
@@ -26,12 +25,12 @@ const updateAppSettingsToNextMonth = async (
 };
 
 export const GET = async (request: NextRequest) => {
-  const authHeader = request.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response('Unauthorized', {
-      status: 401,
-    });
-  }
+  // const authHeader = request.headers.get('authorization');
+  // if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  //   return new Response('Unauthorized', {
+  //     status: 401,
+  //   });
+  // }
   const [{ targetMonth, targetYear, deadline }] = await db
     .select({
       targetMonth: appSettings.targetMonth,
@@ -45,7 +44,7 @@ export const GET = async (request: NextRequest) => {
     return Response.json({ success: false, message: 'Deadline not reached' });
   }
 
-  await updateAppSettingsToNextMonth(targetMonth, deadline);
+  // await updateAppSettingsToNextMonth(targetMonth, deadline);
 
   const requests = await db
     .select({
@@ -84,36 +83,51 @@ export const GET = async (request: NextRequest) => {
     };
     childrenEmails: { [childId: string]: Set<[string, string]> };
   }>(
-    (acc, { childId, day, month, year, user, mealRequestId }) => {
+    (acc, { childId, day, month, year, user, mealRequestId, type }) => {
       const date = `${year}-${month}-${day}`;
       const childEmails = acc.childrenEmails[childId]
         ? acc.childrenEmails[childId]
         : new Set<[string, string]>();
       childEmails.add([user.email, user.firstName ?? 'Anonymer Nutzer']);
-
+      const childrenEmails = { ...acc.childrenEmails, [childId]: childEmails };
+      if (type === 'lunch') {
+        return {
+          lottery: {
+            ...acc.lottery,
+            lunch: {
+              ...acc.lottery.lunch,
+              [date]: [
+                ...(acc.lottery.lunch[date] ?? []),
+                { childId, mealRequestId },
+              ],
+            },
+          },
+          childrenEmails,
+        };
+      }
       return {
         lottery: {
-          lunch: {
-            ...acc.lottery.lunch,
-            [date]: [...acc.lottery.lunch[date], { childId, mealRequestId }],
-          },
+          ...acc.lottery,
           snacks: {
             ...acc.lottery.snacks,
-            [date]: [...acc.lottery.snacks[date], { childId, mealRequestId }],
+            [date]: [
+              ...(acc.lottery.snacks[date] ?? []),
+              { childId, mealRequestId },
+            ],
           },
         },
-        childrenEmails: {
-          ...acc.childrenEmails,
-          [childId]: childEmails,
-        },
+        childrenEmails,
       };
     },
     { lottery: { lunch: {}, snacks: {} }, childrenEmails: {} },
   );
+
   const { results: lunchResults } = draw({ openDraws: lottery.lunch });
-  const { results: snackResults } = draw(
-    preDraw({ openSnackDraws: lottery.snacks, lunchResults }),
-  );
+  const preDrawResults = preDraw({
+    openSnackDraws: lottery.snacks,
+    lunchResults,
+  });
+  const { results: snackResults } = draw(preDrawResults);
   for (const [childId, [email, firstName]] of Object.entries(childrenEmails)) {
     const assignedLunchDate = lunchResults[childId];
     const assignedSnackDate = snackResults[childId];
@@ -123,11 +137,12 @@ export const GET = async (request: NextRequest) => {
     const snackText = assignedSnackDate
       ? `Gezogener Jausentermin: ${assignedSnackDate.date}`
       : 'Leider konnte euch kein Jausentermin zugewiesen werden.';
-    sendEmail({
-      to: email,
-      subject: 'Die Essenslotterieergebnisse sind da!',
-      text: `Hi ${firstName},\n\nDie Ergebnisse der Essenslotterie sind da:\n\n${lunchText}\n${snackText}\n\nBitte trage wie gehabt Dein Menü bei Google Sheets ein, sobald das Sheet verfügbar ist (ab ca. 9 Uhr am 15.).`,
-    });
+    console.log({ email, firstName, lunchText, snackText });
+    // sendEmail({
+    //   to: email,
+    //   subject: 'Die Essenslotterieergebnisse sind da!',
+    //   text: `Hi ${firstName},\n\nDie Ergebnisse der Essenslotterie sind da:\n\n${lunchText}\n${snackText}\n\nBitte trage wie gehabt Dein Menü bei Google Sheets ein, sobald das Sheet verfügbar ist (ab ca. 9 Uhr am 15.).`,
+    // });
     if (assignedLunchDate) {
       await db
         .update(mealRequests)
@@ -144,5 +159,5 @@ export const GET = async (request: NextRequest) => {
     // TODO add results to google docs
   }
 
-  return Response.json({ success: true });
+  return Response.json({ success: true, status: 200 });
 };

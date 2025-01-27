@@ -38,8 +38,8 @@ const DateSelection: FC<DateSelectionProps> = async ({ type, className }) => {
     })
     .from(appSettings);
   const normalizedTargetYear = getYearFromTargetMonthAndYear(
-    targetYear,
     targetMonth,
+    targetYear,
   );
 
   const selectedDays = await db

@@ -55,7 +55,7 @@ const DateSelectionClient: FC<DateSelectionClientProps> = ({
           className="disabled:text-muted-foreground"
           icon={<PlusCircle className="h-4 w-4" />}
           onClick={() => {
-            if (dates.some((date) => date === 'new')) {
+            if (dates.some((date) => date === null)) {
               toast.error('Bitte wähle einen Termin aus.');
               return;
             }

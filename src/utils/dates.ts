@@ -25,8 +25,8 @@ export const getMonthDateString = (date?: string | number | Date) => {
 };
 
 export const getYearFromTargetMonthAndYear = (
-  targetYear: number,
   targetMonth: number,
+  targetYear: number,
 ) => {
   return targetMonth && targetMonth < 9 ? targetYear + 1 : targetYear;
 };
