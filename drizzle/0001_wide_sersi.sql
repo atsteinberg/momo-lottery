@@ -1,0 +1,1 @@
+ALTER TABLE "meal_requests" ADD COLUMN "has_won" boolean;

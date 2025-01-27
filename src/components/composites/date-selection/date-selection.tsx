@@ -41,7 +41,6 @@ const DateSelection: FC<DateSelectionProps> = async ({ type, className }) => {
     targetYear,
     targetMonth,
   );
-  console.log('normalizedTargetYear', normalizedTargetYear);
 
   const selectedDays = await db
     .select({
@@ -82,8 +81,6 @@ const DateSelection: FC<DateSelectionProps> = async ({ type, className }) => {
   const availableDates = availableDays.map(
     ({ year, month, day }) => new Date(year, month - 1, day),
   );
-
-  console.log('availableDates', availableDates);
 
   return (
     <div className={cn('bg-card rounded-lg p-4', className)}>

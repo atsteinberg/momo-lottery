@@ -118,16 +118,28 @@ export const GET = async (request: NextRequest) => {
     const assignedLunchDate = lunchResults[childId];
     const assignedSnackDate = snackResults[childId];
     const lunchText = assignedLunchDate
-      ? `Gezogener Mittagessenstermin: ${assignedLunchDate}`
+      ? `Gezogener Mittagessenstermin: ${assignedLunchDate.date}`
       : 'Leider konnte euch kein Mittagessenstermin zugewiesen werden.';
     const snackText = assignedSnackDate
-      ? `Gezogener Jausentermin: ${assignedSnackDate}`
+      ? `Gezogener Jausentermin: ${assignedSnackDate.date}`
       : 'Leider konnte euch kein Jausentermin zugewiesen werden.';
     sendEmail({
       to: email,
       subject: 'Die Essenslotterieergebnisse sind da!',
       text: `Hi ${firstName},\n\nDie Ergebnisse der Essenslotterie sind da:\n\n${lunchText}\n${snackText}\n\nBitte trage wie gehabt Dein Menü bei Google Sheets ein, sobald das Sheet verfügbar ist (ab ca. 9 Uhr am 15.).`,
     });
+    if (assignedLunchDate) {
+      await db
+        .update(mealRequests)
+        .set({ hasWon: true })
+        .where(eq(mealRequests.id, assignedLunchDate.mealRequestId));
+    }
+    if (assignedSnackDate) {
+      await db
+        .update(mealRequests)
+        .set({ hasWon: true })
+        .where(eq(mealRequests.id, assignedSnackDate.mealRequestId));
+    }
 
     // TODO add results to google docs
   }
