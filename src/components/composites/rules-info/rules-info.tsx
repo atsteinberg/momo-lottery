@@ -1,11 +1,16 @@
 import MobileTooltip from '@/components/ui/mobile-tooltip';
 import Typography from '@/components/ui/typography';
+import db from '@/services/db';
+import { appSettings } from '@/services/db/schema';
 import { PropsWithClassName } from '@/types/react';
 import { cn } from '@/utils/tailwind';
 import { Info } from 'lucide-react';
 import { FC } from 'react';
 
-const RulesInfo: FC<PropsWithClassName> = ({ className }) => {
+const RulesInfo: FC<PropsWithClassName> = async ({ className }) => {
+  const [{ deadline }] = await db
+    .select({ deadline: appSettings.deadline })
+    .from(appSettings);
   return (
     <MobileTooltip trigger={<Info className={cn('h-4 w-4', className)} />}>
       <Typography>
@@ -18,8 +23,8 @@ const RulesInfo: FC<PropsWithClassName> = ({ className }) => {
         Wähle einfach maximal 5 mögliche Termine für Jause und maximal 5
         mögliche Termine fürs Mittagessen. Jeweils ein Termin pro Kind wird
         vergeben, bevor die Essensliste live geht. Bei Konflikten entscheidet
-        das Los. Sollte keiner der gewünschten Termine für Dich frei sein, wirst
-        Du rechtzeitig per Email informiert.
+        das Los. Über das Ergebnis wirst Du nach Ablauf der Deadline (derzeit
+        zum Ende des {deadline.toLocaleDateString()}) per Email informiert.
       </Typography>
       <Typography>
         <Typography as="span" className="text-destructive">

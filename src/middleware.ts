@@ -5,8 +5,8 @@ export default clerkMiddleware(async (auth, req) => {
   const { userId } = auth();
   if (!userId) {
     if (
-      !req.nextUrl.pathname.startsWith('/api/users')
-      // req.nextUrl.pathname !== '/api/draw'
+      !req.nextUrl.pathname.startsWith('/api/users') &&
+      req.nextUrl.pathname !== '/api/draw'
     ) {
       auth().protect();
     }
@@ -16,7 +16,8 @@ export default clerkMiddleware(async (auth, req) => {
   if (
     req.nextUrl.pathname === '/register' ||
     req.nextUrl.pathname === '/unverified' ||
-    req.nextUrl.pathname.startsWith('/api/users')
+    req.nextUrl.pathname.startsWith('/api/users') ||
+    req.nextUrl.pathname === '/api/draw'
   ) {
     return NextResponse.next();
   }

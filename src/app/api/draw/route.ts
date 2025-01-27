@@ -26,12 +26,12 @@ const updateAppSettingsToNextMonth = async (
 };
 
 export const GET = async (request: NextRequest) => {
-  // const authHeader = request.headers.get('authorization');
-  // if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-  //   return new Response('Unauthorized', {
-  //     status: 401,
-  //   });
-  // }
+  const authHeader = request.headers.get('authorization');
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return new Response('Unauthorized', {
+      status: 401,
+    });
+  }
   const [{ targetMonth, targetYear, deadline }] = await db
     .select({
       targetMonth: appSettings.targetMonth,
@@ -45,7 +45,7 @@ export const GET = async (request: NextRequest) => {
     return Response.json({ success: false, message: 'Deadline not reached' });
   }
 
-  // await updateAppSettingsToNextMonth(targetMonth, deadline);
+  await updateAppSettingsToNextMonth(targetMonth, deadline);
 
   const requests = await db
     .select({
@@ -147,10 +147,10 @@ export const GET = async (request: NextRequest) => {
     const assignedLunchDate = lunchResults[childId];
     const assignedSnackDate = snackResults[childId];
     const lunchText = assignedLunchDate
-      ? `Gezogener Mittagessenstermin: ${assignedLunchDate.date}`
+      ? `Gezogener Mittagessenstermin: ${new Date(assignedLunchDate.date).toLocaleDateString()}`
       : 'Leider konnte euch kein Mittagessenstermin zugewiesen werden.';
     const snackText = assignedSnackDate
-      ? `Gezogener Jausentermin: ${assignedSnackDate.date}`
+      ? `Gezogener Jausentermin: ${new Date(assignedSnackDate.date).toLocaleDateString()}`
       : 'Leider konnte euch kein Jausentermin zugewiesen werden.';
     emails.forEach(async ({ email, firstName }) => {
       await sendEmail({
