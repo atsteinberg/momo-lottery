@@ -6,7 +6,7 @@ import {
   mealRequests,
 } from '@/services/db/schema';
 import { PropsWithClassName } from '@/types/react';
-import { getNormalizedTargetYear } from '@/utils/dates';
+import { getYearFromTargetMonthAndYear } from '@/utils/dates';
 import { cn } from '@/utils/tailwind';
 import { getExistingUser } from '@/utils/user';
 import { and, eq } from 'drizzle-orm';
@@ -37,7 +37,10 @@ const DateSelection: FC<DateSelectionProps> = async ({ type, className }) => {
       targetYear: appSettings.targetYear,
     })
     .from(appSettings);
-  const normalizedTargetYear = getNormalizedTargetYear(targetYear, targetMonth);
+  const normalizedTargetYear = getYearFromTargetMonthAndYear(
+    targetYear,
+    targetMonth,
+  );
   console.log('normalizedTargetYear', normalizedTargetYear);
 
   const selectedDays = await db
