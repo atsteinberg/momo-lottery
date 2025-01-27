@@ -1,19 +1,25 @@
 import db from '@/services/db';
-import { appSettings, mealRequests, users } from '@/services/db/schema';
+import {
+  appSettings,
+  mealDays,
+  mealRequestMealDays,
+  mealRequests,
+  users,
+} from '@/services/db/schema';
 import { sendEmail } from '@/services/db/sendgrid';
-import { getMonthDateString } from '@/utils/dates';
+import { getYearFromTargetMonthAndYear } from '@/utils/dates';
 import { draw, preDraw } from '@/utils/draws';
 import { addMonths } from 'date-fns';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import type { NextRequest } from 'next/server';
 
 const updateAppSettingsToNextMonth = async (
-  targetMonth: string,
+  currentTargetMonth: number,
   deadline: Date,
 ) => {
   await db.update(appSettings).set({
-    targetMonth: getMonthDateString(addMonths(targetMonth, 1)),
+    targetMonth: (currentTargetMonth % 12) + 1,
     deadline: addMonths(deadline, 1),
   });
   revalidatePath('/');
@@ -26,60 +32,79 @@ export const GET = async (request: NextRequest) => {
       status: 401,
     });
   }
-  const [{ targetMonth, deadline }] = await db
+  const [{ targetMonth, targetYear, deadline }] = await db
     .select({
       targetMonth: appSettings.targetMonth,
+      targetYear: appSettings.targetYear,
       deadline: appSettings.deadline,
     })
     .from(appSettings);
 
   if (deadline > new Date()) {
     // deadline later than now, do nothing
-    return Response.json({ success: true });
+    return Response.json({ success: false, message: 'Deadline not reached' });
   }
 
   await updateAppSettingsToNextMonth(targetMonth, deadline);
 
   const requests = await db
     .select({
+      mealRequestId: mealRequests.id,
       childId: mealRequests.childId,
       user: {
         email: users.email,
         firstName: users.firstName,
       },
-      date: mealRequests.date,
+      day: mealDays.day,
+      month: mealDays.month,
+      year: mealDays.year,
+      type: mealDays.type,
     })
     .from(mealRequests)
     .innerJoin(users, eq(users.id, mealRequests.userId))
-    .where(eq(mealRequests.targetMonth, targetMonth));
-
-  // changing appSettings to next month
+    .innerJoin(
+      mealRequestMealDays,
+      eq(mealRequests.id, mealRequestMealDays.mealRequestId),
+    )
+    .innerJoin(mealDays, eq(mealRequestMealDays.mealDayId, mealDays.id))
+    .where(
+      and(
+        eq(mealDays.month, targetMonth),
+        eq(
+          mealDays.year,
+          getYearFromTargetMonthAndYear(targetMonth, targetYear),
+        ),
+      ),
+    );
 
   const { lottery, childrenEmails } = requests.reduce<{
     lottery: {
-      lunch: { [date: string]: string[] };
-      snacks: { [date: string]: string[] };
+      lunch: { [date: string]: { childId: string; mealRequestId: string }[] };
+      snacks: { [date: string]: { childId: string; mealRequestId: string }[] };
     };
-    childrenEmails: { [childId: string]: [string, string][] };
+    childrenEmails: { [childId: string]: Set<[string, string]> };
   }>(
-    (acc, { childId, date, user }) => {
+    (acc, { childId, day, month, year, user, mealRequestId }) => {
+      const date = `${year}-${month}-${day}`;
+      const childEmails = acc.childrenEmails[childId]
+        ? acc.childrenEmails[childId]
+        : new Set<[string, string]>();
+      childEmails.add([user.email, user.firstName ?? 'Anonymer Nutzer']);
+
       return {
         lottery: {
           lunch: {
             ...acc.lottery.lunch,
-            [date]: [...acc.lottery.lunch[date], childId],
+            [date]: [...acc.lottery.lunch[date], { childId, mealRequestId }],
           },
           snacks: {
             ...acc.lottery.snacks,
-            [date]: [...acc.lottery.snacks[date], childId],
+            [date]: [...acc.lottery.snacks[date], { childId, mealRequestId }],
           },
         },
         childrenEmails: {
           ...acc.childrenEmails,
-          [childId]: [
-            ...acc.childrenEmails[childId],
-            [user.email, user.firstName ?? 'Anonymer Benutzer'],
-          ],
+          [childId]: childEmails,
         },
       };
     },

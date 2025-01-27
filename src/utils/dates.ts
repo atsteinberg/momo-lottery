@@ -24,7 +24,7 @@ export const getMonthDateString = (date?: string | number | Date) => {
   return format(date, 'yyyy-MM');
 };
 
-export const getNormalizedTargetYear = (
+export const getYearFromTargetMonthAndYear = (
   targetYear: number,
   targetMonth: number,
 ) => {

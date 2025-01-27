@@ -2,8 +2,8 @@ export const draw = ({
   openDraws,
   results = {},
 }: {
-  openDraws: { [date: string]: string[] };
-  results?: { [childId: string]: string };
+  openDraws: { [date: string]: { childId: string; mealRequestId: string }[] };
+  results?: { [childId: string]: { date: string; mealRequestId: string } };
 }) => {
   if (Object.keys(openDraws).length === 0) {
     return {
@@ -12,7 +12,7 @@ export const draw = ({
     };
   }
   const draws = Object.entries(openDraws).filter(
-    ([date]) => !Object.values(results).includes(date),
+    ([date]) => !Object.values(results).some((result) => result.date === date),
   );
   if (draws.length === 0) {
     return {
@@ -23,7 +23,7 @@ export const draw = ({
   const dateIndex = Math.floor(Math.random() * draws.length);
   const [date, candidates] = draws[dateIndex];
   const filteredCandidates = candidates.filter(
-    (candidate) => !Object.keys(results).includes(candidate),
+    ({ childId }) => !Object.keys(results).includes(childId),
   );
   if (filteredCandidates.length === 0) {
     return {
@@ -32,10 +32,10 @@ export const draw = ({
     };
   }
   const childIndex = Math.floor(Math.random() * filteredCandidates.length);
-  const selectedChildId = filteredCandidates[childIndex];
+  const { childId, mealRequestId } = filteredCandidates[childIndex];
   return {
     openDraws: Object.fromEntries(draws.toSpliced(dateIndex, 1)),
-    results: { ...results, [selectedChildId]: date },
+    results: { ...results, [childId]: { date, mealRequestId } },
   };
 };
 
@@ -43,22 +43,32 @@ export const preDraw = ({
   openSnackDraws,
   lunchResults,
 }: {
-  openSnackDraws: { [date: string]: string[] };
-  lunchResults: { [childId: string]: string };
+  openSnackDraws: {
+    [date: string]: { childId: string; mealRequestId: string }[];
+  };
+  lunchResults: { [childId: string]: { date: string; mealRequestId: string } };
 }) => {
   return Object.entries(openSnackDraws).reduce<{
-    openDraws: { [date: string]: string[] };
-    results: { [childId: string]: string };
+    openDraws: { [date: string]: { childId: string; mealRequestId: string }[] };
+    results: { [childId: string]: { date: string; mealRequestId: string } };
   }>(
     (acc, [date, candidates]) => {
-      const lunchWinner = lunchResults[date];
-      if (candidates.includes(lunchWinner)) {
+      const [lunchWinnerId] =
+        Object.entries(lunchResults).find(([_, { date: resultDate }]) => {
+          return resultDate === date;
+        }) ?? [];
+      const { mealRequestId } =
+        candidates.find(({ childId }) => childId === lunchWinnerId) ?? {};
+      if (lunchWinnerId && mealRequestId) {
         return {
           ...acc,
           openDraws: acc.openDraws,
           results: {
             ...acc.results,
-            [date]: lunchWinner,
+            [lunchWinnerId]: {
+              date,
+              mealRequestId,
+            },
           },
         };
       }
