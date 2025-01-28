@@ -28,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <GlobalContextProvider>
-      <html lang="en" className="h-dvh flex-1">
+      <html lang="en" className="h-dvh flex-1 background-red">
         <head>
           <link
             rel="icon"
@@ -50,7 +50,7 @@ export default function RootLayout({
           <link rel="manifest" href="/assets/favicon/site.webmanifest" />
         </head>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased flex bg-secondary flex-1 flex-col max-h-screen overflow-hidden min-h-screen`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased flex bg-secondary flex-1 flex-col`}
         >
           <Header />
           <main className="flex-1 flex overflow-auto p-2 sm:p-8 max-w-7xl w-full  mx-auto">
