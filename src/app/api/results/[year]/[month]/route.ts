@@ -75,6 +75,8 @@ export const POST = async (request: NextRequest, { params }: RouteParams) => {
       cell.save();
     } catch (error) {
       console.error('Failed to update sheet:', error);
+    } finally {
+      sheet.saveUpdatedCells();
     }
   });
 
