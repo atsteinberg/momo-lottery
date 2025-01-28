@@ -26,12 +26,15 @@ const dateHeaderRow = 4;
 
 export const POST = async (request: NextRequest, { params }: RouteParams) => {
   const { year, month } = params;
-  const { sheetId } = await request.json();
-  if (!sheetId) {
-    return Response.json({ message: 'No sheetId provided' }, { status: 400 });
-  }
+  const sheetName = `${year.slice(-2)}-${month}`;
   const doc = await getSpreadSheetDoc();
-  const sheet = doc.sheetsById[sheetId];
+  const sheet = doc.sheetsByTitle[sheetName];
+  if (!sheet) {
+    return Response.json(
+      { message: `Cannot access sheet ${sheetName}` },
+      { status: 400 },
+    );
+  }
   await sheet.loadCells();
   const winners = await db
     .select({
