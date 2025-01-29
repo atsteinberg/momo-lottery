@@ -4,7 +4,6 @@ import {
   date,
   integer,
   pgTable,
-  primaryKey,
   text,
   timestamp,
   unique,
@@ -68,35 +67,6 @@ export const mealRequests = pgTable('meal_requests', {
   hasWon: boolean('has_won'),
 });
 
-export const mealRequestMealDays = pgTable(
-  'meal_request_meal_days',
-  {
-    mealRequestId: uuid('meal_request_id')
-      .notNull()
-      .references(() => mealRequests.id),
-    mealDayId: uuid('meal_day_id')
-      .notNull()
-      .references(() => mealDays.id),
-  },
-  (t) => ({
-    pk: primaryKey({ columns: [t.mealRequestId, t.mealDayId] }),
-  }),
-);
-
-export const mealRequestMealDaysRelations = relations(
-  mealRequestMealDays,
-  ({ one }) => ({
-    mealRequest: one(mealRequests, {
-      fields: [mealRequestMealDays.mealRequestId],
-      references: [mealRequests.id],
-    }),
-    mealDay: one(mealDays, {
-      fields: [mealRequestMealDays.mealDayId],
-      references: [mealDays.id],
-    }),
-  }),
-);
-
 export const mealDays = pgTable(
   'meal_days',
   {
@@ -121,11 +91,3 @@ export const mealDays = pgTable(
     ),
   }),
 );
-
-export const mealRequestRelations = relations(mealRequests, ({ many }) => ({
-  mealRequestMealDays: many(mealRequestMealDays),
-}));
-
-export const mealDaysRelations = relations(mealDays, ({ many }) => ({
-  mealRequestMealDays: many(mealRequestMealDays),
-}));

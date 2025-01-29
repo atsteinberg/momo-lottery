@@ -1,10 +1,5 @@
 import db from '@/services/db';
-import {
-  appSettings,
-  mealDays,
-  mealRequestMealDays,
-  mealRequests,
-} from '@/services/db/schema';
+import { appSettings, mealDays, mealRequests } from '@/services/db/schema';
 import { PropsWithClassName } from '@/types/react';
 import { getYearFromTargetMonthAndYear } from '@/utils/dates';
 import { cn } from '@/utils/tailwind';
@@ -49,11 +44,7 @@ const DateSelection: FC<DateSelectionProps> = async ({ type, className }) => {
       day: mealDays.day,
     })
     .from(mealRequests)
-    .innerJoin(
-      mealRequestMealDays,
-      eq(mealRequests.id, mealRequestMealDays.mealRequestId),
-    )
-    .innerJoin(mealDays, eq(mealRequestMealDays.mealDayId, mealDays.id))
+    .innerJoin(mealDays, eq(mealRequests.mealDayId, mealDays.id))
     .where(
       and(
         eq(mealRequests.childId, user.childId),

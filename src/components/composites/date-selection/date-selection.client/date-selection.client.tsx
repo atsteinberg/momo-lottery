@@ -78,7 +78,7 @@ const DateSelectionClient: FC<DateSelectionClientProps> = ({
             )}
             className="h-14"
             month={month}
-            setDate={(date) => {
+            setDate={async (date) => {
               if (date === null) {
                 const oldDate = dates[index];
                 setDates((prev) => {
@@ -87,10 +87,24 @@ const DateSelectionClient: FC<DateSelectionClientProps> = ({
                   return newDates;
                 });
                 if (oldDate && typeof oldDate === 'object') {
-                  removeDate({
-                    type,
-                    date: oldDate,
-                  });
+                  try {
+                    await removeDate({
+                      type,
+                      date: oldDate,
+                    });
+                  } catch (error) {
+                    toast.error(
+                      error instanceof Error
+                        ? error.message
+                        : 'Ein Fehler ist aufgetreten',
+                    );
+                    // Revert the state change
+                    setDates((prev) => {
+                      const newDates = [...prev];
+                      newDates.splice(index, 0, oldDate);
+                      return newDates;
+                    });
+                  }
                 }
                 return;
               }
@@ -109,10 +123,19 @@ const DateSelectionClient: FC<DateSelectionClientProps> = ({
                   newDates[index] = date;
                   return newDates;
                 });
-                addDate({
-                  type,
-                  date,
-                });
+                try {
+                  await addDate({
+                    type,
+                    date,
+                  });
+                } catch (error) {
+                  toast.error(
+                    error instanceof Error
+                      ? error.message
+                      : 'Ein Fehler ist aufgetreten',
+                  );
+                  setDates((prev) => [...prev].toSpliced(index, 1));
+                }
               }
             }}
           />

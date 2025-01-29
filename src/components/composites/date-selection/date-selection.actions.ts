@@ -1,11 +1,8 @@
 'use server';
 
 import db from '@/services/db';
-import {
-  mealDays,
-  mealRequestMealDays,
-  mealRequests,
-} from '@/services/db/schema';
+import { appSettings, mealDays, mealRequests } from '@/services/db/schema';
+import { getYearFromTargetMonthAndYear } from '@/utils/dates';
 import { getExistingUser } from '@/utils/user';
 import { and, eq } from 'drizzle-orm';
 
@@ -14,7 +11,7 @@ type DateActionParams = {
   date: Date;
 };
 
-export async function addDate({ type, date }: DateActionParams) {
+export const addDate = async ({ type, date }: DateActionParams) => {
   const user = await getExistingUser();
 
   const year = date.getFullYear();
@@ -22,7 +19,20 @@ export async function addDate({ type, date }: DateActionParams) {
   const day = date.getDate();
 
   return await db.transaction(async (tx) => {
-    if (!user.childId) throw new Error('No child ID found');
+    const [{ targetMonth, targetYear }] = await tx
+      .select({
+        targetMonth: appSettings.targetMonth,
+        targetYear: appSettings.targetYear,
+      })
+      .from(appSettings);
+
+    if (
+      targetMonth !== month ||
+      getYearFromTargetMonthAndYear(targetMonth, targetYear) === year
+    ) {
+      throw new Error('Das ausgewählte Datum ist nicht (mehr) auswählbar.');
+    }
+    if (!user.childId) throw new Error('Es konnte kein Kind gefunden werden.');
     const [{ mealDayId }] = await tx
       .select({ mealDayId: mealDays.id })
       .from(mealDays)
@@ -35,20 +45,15 @@ export async function addDate({ type, date }: DateActionParams) {
         ),
       );
 
-    const [{ mealRequestId }] = await tx
-      .insert(mealRequests)
-      .values({
-        childId: user.childId,
-        userId: user.id,
-        mealDayId: mealDayId,
-      })
-      .returning({ mealRequestId: mealRequests.id });
-
-    await tx.insert(mealRequestMealDays).values({ mealDayId, mealRequestId });
+    await tx.insert(mealRequests).values({
+      childId: user.childId,
+      userId: user.id,
+      mealDayId: mealDayId,
+    });
   });
-}
+};
 
-export async function removeDate({ type, date }: DateActionParams) {
+export const removeDate = async ({ type, date }: DateActionParams) => {
   const user = await getExistingUser();
 
   const year = date.getFullYear();
@@ -56,15 +61,11 @@ export async function removeDate({ type, date }: DateActionParams) {
   const day = date.getDate();
 
   return await db.transaction(async (tx) => {
-    if (!user.childId) throw new Error('No child ID found');
-    const [{ mealRequestId, mealDayId }] = await tx
+    if (!user.childId) throw new Error('Es konnte kein Kind gefunden werden.');
+    const [{ mealRequestId }] = await tx
       .select({ mealRequestId: mealRequests.id, mealDayId: mealDays.id })
       .from(mealRequests)
-      .innerJoin(
-        mealRequestMealDays,
-        eq(mealRequests.id, mealRequestMealDays.mealRequestId),
-      )
-      .innerJoin(mealDays, eq(mealRequestMealDays.mealDayId, mealDays.id))
+      .innerJoin(mealDays, eq(mealRequests.mealDayId, mealDays.id))
       .where(
         and(
           eq(mealDays.type, type),
@@ -75,15 +76,6 @@ export async function removeDate({ type, date }: DateActionParams) {
         ),
       );
 
-    await tx
-      .delete(mealRequestMealDays)
-      .where(
-        and(
-          eq(mealRequestMealDays.mealDayId, mealDayId),
-          eq(mealRequestMealDays.mealRequestId, mealRequestId),
-        ),
-      );
-
     await tx.delete(mealRequests).where(eq(mealRequests.id, mealRequestId));
   });
-}
+};

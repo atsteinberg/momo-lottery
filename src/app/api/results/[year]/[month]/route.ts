@@ -1,10 +1,5 @@
 import db from '@/services/db';
-import {
-  children,
-  mealDays,
-  mealRequestMealDays,
-  mealRequests,
-} from '@/services/db/schema';
+import { children, mealDays, mealRequests } from '@/services/db/schema';
 import getSpreadSheetDoc from '@/services/google-sheets';
 import { and, eq } from 'drizzle-orm';
 import { NextRequest } from 'next/server';
@@ -45,11 +40,7 @@ export const POST = async (request: NextRequest, { params }: RouteParams) => {
       type: mealDays.type,
     })
     .from(mealRequests)
-    .innerJoin(
-      mealRequestMealDays,
-      eq(mealRequests.id, mealRequestMealDays.mealRequestId),
-    )
-    .innerJoin(mealDays, eq(mealRequestMealDays.mealDayId, mealDays.id))
+    .innerJoin(mealDays, eq(mealRequests.mealDayId, mealDays.id))
     .innerJoin(children, eq(mealRequests.childId, children.id))
     .where(
       and(

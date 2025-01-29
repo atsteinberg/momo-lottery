@@ -2,7 +2,6 @@ import db from '@/services/db';
 import {
   appSettings,
   mealDays,
-  mealRequestMealDays,
   mealRequests,
   users,
 } from '@/services/db/schema';
@@ -62,11 +61,7 @@ export const GET = async (request: NextRequest) => {
     })
     .from(mealRequests)
     .innerJoin(users, eq(users.id, mealRequests.userId))
-    .innerJoin(
-      mealRequestMealDays,
-      eq(mealRequests.id, mealRequestMealDays.mealRequestId),
-    )
-    .innerJoin(mealDays, eq(mealRequestMealDays.mealDayId, mealDays.id))
+    .innerJoin(mealDays, eq(mealRequests.mealDayId, mealDays.id))
     .where(
       and(
         eq(mealDays.month, targetMonth),
