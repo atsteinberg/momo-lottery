@@ -40,6 +40,7 @@ export async function addDate({ type, date }: DateActionParams) {
       .values({
         childId: user.childId,
         userId: user.id,
+        mealDayId: mealDayId,
       })
       .returning({ mealRequestId: mealRequests.id });
 

@@ -62,6 +62,9 @@ export const mealRequests = pgTable('meal_requests', {
   childId: uuid('child_id')
     .references(() => children.id)
     .notNull(),
+  mealDayId: uuid('meal_day_id')
+    .references(() => mealDays.id)
+    .notNull(),
   hasWon: boolean('has_won'),
 });
 

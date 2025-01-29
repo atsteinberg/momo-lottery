@@ -6,7 +6,7 @@ import {
   mealRequests,
   users,
 } from '@/services/db/schema';
-import { sendEmail } from '@/services/db/sendgrid';
+import { sendEmail } from '@/services/sendgrid';
 import { getYearFromTargetMonthAndYear } from '@/utils/dates';
 import { draw, preDraw } from '@/utils/draws';
 import { addMonths } from 'date-fns';

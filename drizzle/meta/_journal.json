@@ -15,6 +15,20 @@
       "when": 1737984915317,
       "tag": "0001_wide_sersi",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1738151127026,
+      "tag": "0002_daily_tyger_tiger",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1738151694547,
+      "tag": "0003_sour_war_machine",
+      "breakpoints": true
     }
   ]
 }

@@ -3,7 +3,7 @@
 import db from '@/services/db';
 
 import { children, users } from '@/services/db/schema';
-import { sendEmail } from '@/services/db/sendgrid';
+import { sendEmail } from '@/services/sendgrid';
 import { currentUser } from '@clerk/nextjs/server';
 import { eq, sql } from 'drizzle-orm';
 import { FormSchema, SelectChildFormValues } from './select-child.schema';
