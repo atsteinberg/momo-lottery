@@ -28,7 +28,7 @@ export const addDate = async ({ type, date }: DateActionParams) => {
 
     if (
       targetMonth !== month ||
-      getYearFromTargetMonthAndYear(targetMonth, targetYear) === year
+      getYearFromTargetMonthAndYear(targetMonth, targetYear) !== year
     ) {
       throw new Error('Das ausgewählte Datum ist nicht (mehr) auswählbar.');
     }
