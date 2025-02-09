@@ -15,8 +15,6 @@ export const addDate = async ({ type, date }: DateActionParams) => {
   const user = await getExistingUser();
   const { year, month, day } = parseCETDate(date);
 
-  console.log({ year, month, day });
-
   return await db.transaction(async (tx) => {
     const [{ targetMonth, targetYear }] = await tx
       .select({
