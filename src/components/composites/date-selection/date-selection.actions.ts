@@ -2,7 +2,7 @@
 
 import db from '@/services/db';
 import { appSettings, mealDays, mealRequests } from '@/services/db/schema';
-import { getYearFromTargetMonthAndYear } from '@/utils/dates';
+import { getYearFromTargetMonthAndYear, parseCETDate } from '@/utils/dates';
 import { getExistingUser } from '@/utils/user';
 import { and, eq } from 'drizzle-orm';
 
@@ -13,10 +13,7 @@ type DateActionParams = {
 
 export const addDate = async ({ type, date }: DateActionParams) => {
   const user = await getExistingUser();
-
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
+  const { year, month, day } = parseCETDate(date);
 
   console.log({ year, month, day });
 
@@ -57,10 +54,7 @@ export const addDate = async ({ type, date }: DateActionParams) => {
 
 export const removeDate = async ({ type, date }: DateActionParams) => {
   const user = await getExistingUser();
-
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
+  const { year, month, day } = parseUTCDate(date);
 
   return await db.transaction(async (tx) => {
     if (!user.childId) throw new Error('Es konnte kein Kind gefunden werden.');
