@@ -18,6 +18,8 @@ export const addDate = async ({ type, date }: DateActionParams) => {
   const month = date.getMonth() + 1;
   const day = date.getDate();
 
+  console.log({ year, month, day });
+
   return await db.transaction(async (tx) => {
     const [{ targetMonth, targetYear }] = await tx
       .select({
