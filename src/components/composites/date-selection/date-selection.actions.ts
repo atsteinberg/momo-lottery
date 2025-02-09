@@ -54,7 +54,7 @@ export const addDate = async ({ type, date }: DateActionParams) => {
 
 export const removeDate = async ({ type, date }: DateActionParams) => {
   const user = await getExistingUser();
-  const { year, month, day } = parseUTCDate(date);
+  const { year, month, day } = parseCETDate(date);
 
   return await db.transaction(async (tx) => {
     if (!user.childId) throw new Error('Es konnte kein Kind gefunden werden.');
